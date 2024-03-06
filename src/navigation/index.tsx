@@ -1,5 +1,5 @@
 import { Role } from "@/lib/enum";
-import { Bolt, Home, LogOut, LucideIcon, Settings, User2 } from "lucide-react";
+import { Home, LogOut, LucideIcon, MessageSquare } from "lucide-react";
 
 export interface NavProps {
   isCollapsed: boolean;
@@ -8,7 +8,7 @@ export interface NavProps {
     label?: string;
     icon: LucideIcon;
     url: string;
-    roles: Role[];
+    roles?: Role[];
   }[];
   userRole?: Role;
 }
@@ -22,25 +22,11 @@ export const dashboardNavigation: NavProps["links"] = [
     roles: [],
   },
   {
-    title: "Customer",
+    title: "Chat",
     label: "",
-    icon: User2,
-    url: "/dashboard/customer",
-    roles: [Role.Admin],
-  },
-  {
-    title: "User",
-    label: "",
-    icon: User2,
-    url: "/dashboard/user",
-    roles: [Role.Customer],
-  },
-  {
-    title: "Setup",
-    label: "",
-    icon: Bolt,
-    url: "/dashboard/setup",
-    roles: [Role.Customer],
+    icon: MessageSquare,
+    url: "/dashboard/chat",
+    roles: [],
   },
 ];
 
@@ -49,7 +35,7 @@ export const logoutNavigation: NavProps["links"] = [
     title: "Logout",
     label: "",
     icon: LogOut,
-    url: "/dashboard",
+    url: "/login",
     roles: [],
   },
 ];

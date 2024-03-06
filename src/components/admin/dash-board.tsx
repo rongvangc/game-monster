@@ -1,26 +1,19 @@
 "use client";
 
-import { dashboardNavigation, logoutNavigation } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
-import { ReactNode, useState } from "react";
+import { dashboardNavigation } from "@/navigation";
+import useUserStore from "@/stores/user";
+import Image from "next/image";
+import { ReactNode, useRef, useState } from "react";
+import { ImperativePanelHandle } from "react-resizable-panels";
 import { Logout } from "../common/logout";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "../ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 import { Separator } from "../ui/separator";
 import { TooltipProvider } from "../ui/tooltip";
-import { AccountSwitcher } from "./account-switcher";
+import LogoPng from "./../../../public/images/logo.png";
 import { Nav } from "./nav";
-import useUserStore from "@/stores/user";
 
 interface DashboardBoardProps {
-  accounts: {
-    label: string;
-    email: string;
-    icon: ReactNode;
-  }[];
   navCollapsedSize: number;
   children: ReactNode;
 }
@@ -28,12 +21,24 @@ interface DashboardBoardProps {
 const defaultLayout = [265, 1095];
 
 export function DashBoard({
-  accounts,
   navCollapsedSize,
   children,
 }: Readonly<DashboardBoardProps>) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user } = useUserStore();
+  const ref = useRef<ImperativePanelHandle>(null);
+
+  const collapsePanel = () => {
+    const panel = ref.current;
+
+    if (panel) {
+      if (isCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
+  };
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -42,6 +47,7 @@ export function DashBoard({
         className="h-full min-h-screen items-stretch"
       >
         <ResizablePanel
+          ref={ref}
           defaultSize={defaultLayout[0]}
           collapsedSize={navCollapsedSize}
           collapsible={true}
@@ -54,30 +60,25 @@ export function DashBoard({
             setIsCollapsed(false);
           }}
           className={cn(
-            isCollapsed &&
-              "min-w-[50px] transition-all duration-300 ease-in-out"
+            isCollapsed && "min-w-[50px]",
+            "relative transition-all duration-300 ease-in-out"
           )}
         >
           <div
             className={cn(
-              "flex h-[52px] items-center justify-center",
-              isCollapsed ? "h-[52px]" : "px-2"
+              "flex h-[52px] items-center",
+              isCollapsed ? "h-[52px] justify-center" : "px-2"
             )}
           >
-            <AccountSwitcher isCollapsed={isCollapsed} accounts={accounts} />
+            <Image src={LogoPng} alt="Logo" width={36} />
           </div>
           <Separator />
-          <Nav
-            isCollapsed={isCollapsed}
-            links={dashboardNavigation}
-            userRole={user?.role}
-          />
+          <Nav isCollapsed={isCollapsed} links={dashboardNavigation} />
           <Separator />
-          <div className="w-full p-2">
-            <Logout isCollapsed={isCollapsed} />
+          <div className="w-full p-2 absolute bottom-0">
+            <Logout isCollapsed={isCollapsed} onCollapse={collapsePanel} />
           </div>
         </ResizablePanel>
-        <ResizableHandle withHandle />
         <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
           {children}
         </ResizablePanel>

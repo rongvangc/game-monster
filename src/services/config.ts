@@ -1,7 +1,7 @@
 import { getCookieToken, removeAllCookie } from "@/helpers/cookie";
 import axios, { AxiosInstance } from "axios";
 
-const baseURL = process.env.API_URL;
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 const axiosClient: AxiosInstance = axios.create({
   baseURL,
@@ -18,7 +18,7 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 axiosClient.interceptors.response.use(
-  (response) => response,
+  (response) => response?.data,
   (error) => {
     const { response } = error;
 
@@ -30,7 +30,7 @@ axiosClient.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    throw error;
   }
 );
 

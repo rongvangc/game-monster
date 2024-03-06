@@ -2,21 +2,21 @@
 
 import Link from "next/link";
 
-import { NavProps } from "@/constants/navigation";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { buttonVariants } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useMemo } from "react";
+import { NavProps } from "@/navigation";
 
-export function Nav({ links, isCollapsed, userRole }: Readonly<NavProps>) {
+export function Nav({ links, isCollapsed, userRole = [] }: Readonly<NavProps>) {
   const pathname = usePathname();
 
   const linkByRole = useMemo(() => {
     return links.filter((link) => {
-      if (link.roles.length === 0) {
+      if (link?.roles?.length === 0) {
         return true;
-      } else if (userRole && link.roles.some((role) => role === userRole)) {
+      } else if (userRole && link?.roles?.some((role) => role === userRole)) {
         return true;
       } else {
         return false;

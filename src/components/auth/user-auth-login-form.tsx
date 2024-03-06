@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Icons } from "../icon";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
@@ -10,10 +9,9 @@ import { AuthRequest, login } from "@/services/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { AlertError } from "../alert";
+import { Icons } from "../common/icon";
 import {
   Form,
   FormControl,
@@ -39,8 +37,7 @@ export function UserAuthLoginForm({
   className,
   ...props
 }: UserAuthLoginFormProps) {
-  const { push } = useRouter();
-  const [errMessage, setErrMessage] = useState("");
+  const { replace } = useRouter();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -54,17 +51,19 @@ export function UserAuthLoginForm({
     mutationFn: (authData: AuthRequest) => login(authData),
     mutationKey: ["login"],
     onSuccess(data, variables, context) {
-      setCookieToken(data.data?.access_token);
-      push("/");
+      setCookieToken(data?.access_token);
+      replace("/");
     },
     onError: (_error, variables, _context) => {
       form.reset({ ...variables });
-      setErrMessage("Your email or password is not correct, please try again!");
     },
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    loginMutation.mutate(data);
+    loginMutation.mutate({
+      email: data.email,
+      password: data.password,
+    });
   };
 
   return (
@@ -111,8 +110,6 @@ export function UserAuthLoginForm({
             )}
           </Button>
         </form>
-
-        <AlertError errMessage={errMessage} />
       </Form>
     </div>
   );
